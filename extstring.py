@@ -2,39 +2,33 @@
 # -*- coding: utf-8 -*-
 
 __author__ = 'Markus Thilo'
-__version__ = '0.0.1_2024-09-25'
+__version__ = '0.0.1_2024-09-26'
 __license__ = 'GPL-3'
 __email__ = 'markus.thilo@gmail.com'
 __status__ = 'Testing'
 __description__ = 'Extended methods for strings'
 
+from itertools import chain
+
 class ExtString(str):
 	'''Extended methods for strings'''
 
-	@staticmethod
-	def _deitter(*args):
-		'''Return flattened list from iterable arguments'''
-		flat = list()
-		try:
-			for arg in args:
-				print('DEBUG', flat, arg)
-				flat.extend(ExtString._deitter(arg))
-		except:
-			return list(args)
-		return flat
-
-	def startswith(self, *candidats):
+	def starts_with_iter(self, candidates):
 		'''Extends startswith to an iterable argument'''
-		if isinstance(candidats, str):
-			return string.startswith(candidats)
-		for candidate in candidats:
-			if string.startswith(check):
+		if isinstance(candidates, str):
+			
+			if self.startswith(candidates):
+				return candidates
+			else:
+				return None
+		for candidate in candidates:
+			if self.startswith(candidate):
 				return candidate
 		return None
 
-	def join(self, iterable):
+	def join_tolerant(self, iterable):
 		'''Join iterable to list but be tolerant to missing items'''
-		return self.join([f'{item.strip()}' for item in iterable if item])
+		return self.join([f'{str(item).strip()}' for item in iterable if item])
 
 	def sequence(self, max_len):
 		'''Split string to sequences following punctuation'''
