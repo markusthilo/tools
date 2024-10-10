@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 __author__ = 'Markus Thilo'
-__version__ = '0.0.1_2024-09-26'
+__version__ = '0.0.1_2024-10-10'
 __license__ = 'GPL-3'
 __email__ = 'markus.thilo@gmail.com'
 __status__ = 'Testing'
@@ -16,15 +16,14 @@ class ExtString(str):
 	def starts_with_iter(self, candidates):
 		'''Extends startswith to an iterable argument'''
 		if isinstance(candidates, str):
-			
 			if self.startswith(candidates):
 				return candidates
 			else:
-				return None
+				return
 		for candidate in candidates:
 			if self.startswith(candidate):
 				return candidate
-		return None
+		return
 
 	def join_tolerant(self, iterable):
 		'''Join iterable to list but be tolerant to missing items'''
@@ -32,26 +31,20 @@ class ExtString(str):
 
 	def sequence(self, max_len):
 		'''Split string to sequences following punctuation'''
-		def devide(string):
-			for delimiter in '.!?:;()[]{}|,\n ':
-				splitted = string.split(delimiter, 1)
-				if len(splitted) == 1:
-					continue
-				if len(splitted[0]) <= max_len:
-					return f'{splitted[0]}{delimiter}', splitted[1]
-			return string[:max_len], string[max_len:]
-		if len(self) <= max_len:
-			return [self]
-		raw_sequences = list()
+		sequences = list()
 		leftover = self
 		while leftover:
-			good, leftover = devide(leftover)
-			raw_sequences.append(good)
-		clean_sequences = [raw_sequences[0].strip()]
-		for raw in raw_sequences[1:]:
-			clean = raw.strip()
-			if len(clean_sequences[-1])+len(clean) > max_len:
-				clean_sequences.extend([clean_sequences[-1], clean])
-			else:
-				clean_sequences.append(f'{clean_sequences[-1]}{clean}')
-		return clean_sequences
+			if len(leftover) <= max_len:
+				sequences.append(leftover)
+				break
+			for delimiter in '.!?:;()[]{}|#@\',/\\\n \0':
+				if delimiter == '\0':
+					sequences.append(leftover[:max_len])
+					leftover = leftover[max_len:]
+					break
+				splitted = leftover.split(delimiter, 1)
+				if len(splitted) > 1 and len(splitted[0]) <= max_len:
+					sequences.append(f'{splitted[0].strip()}{delimiter}')
+					leftover = splitted[1].strip()
+					break
+		return sequences
